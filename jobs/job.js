@@ -25,7 +25,6 @@ module.exports = [
 			try {
 				logger.info(`Job starts`);
 				cacheTransactionsData(10000);
-				logger.info(`Job is done`);
 			} catch (error) {
 				console.log("Job failed", error);
 			}
