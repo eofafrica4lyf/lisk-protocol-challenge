@@ -1,7 +1,5 @@
 const { api } = require("../helpers/api");
-const axios = require("axios");
 const { setData: setDataInRedis } = require("../utils/redis");
-const { request } = require("lisk-service-framework/src/http");
 
 const getCurrentBlockHeight = async () => {
 	// No try catch block; we assumed that the remote server is 100% reliable
@@ -76,6 +74,9 @@ const cacheTransactionsData = async (height) => {
 	return;
 };
 module.exports = {
-	cacheTransactionsData,
+    getCurrentBlockHeight,
+    getBlockInfoBetweenHeight,
+    aggregateResult,
 	getTxnsAggregate,
+	cacheTransactionsData,
 };
