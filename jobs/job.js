@@ -13,16 +13,22 @@
  * Removal or modification of this copyright notice is prohibited.
  *
  */
-const logger = require('lisk-service-framework').Logger();
+const logger = require("lisk-service-framework").Logger();
+const { cacheTransactionsData } = require("../shared/dataService/blocks");
 
 module.exports = [
 	{
-		name: 'job.1',
-		description: 'Generic job template',
-		schedule: '* * * * *', // Every 1 min
+		name: "job.1",
+		description: "Generic job template",
+		schedule: "* * * * *", // Every 1 min
 		controller: () => {
-			const operationResult = (() => ([1, 2, 3, 4, 5]))();
-			logger.info(`Dummy job is done, processed ${operationResult.length} items`);
+			try {
+				logger.info(`Job starts`);
+				cacheTransactionsData(10000);
+				logger.info(`Job is done`);
+			} catch (error) {
+				console.log("Job failed", error);
+			}
 		},
 	},
 ];
