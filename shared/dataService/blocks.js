@@ -14,10 +14,10 @@ const getBlockInfoBetweenHeight = async (startingHeight, endingHeight) => {
 			api.get(`https://mainnet.lisk.com/api/blocks?height=${i}`)
 		);
 	}
-	return await Promise.all(requestArray);
+    return await Promise.all(requestArray);
 };
 
-const aggregateResult = async (txnsArray) => {
+const getTotalTransferValue = async (txnsArray) => {
 	const totalTransferValue = txnsArray.reduce((acc, curVal) => {
 		// allow for cases where there is no stated amount, instead there is a votes array of objects
 		// that contain delegateAddress and amount properties, since there is no indication of the
@@ -54,7 +54,7 @@ const getTxnsAggregate = async (height, callUnit = 1000) => {
 			requestArray = [...requestArray, ...aggregatedBatch];
 		}
 
-		const totalTransferValue = await aggregateResult(requestArray);
+		const totalTransferValue = await getTotalTransferValue(requestArray);
 
 		const count = requestArray.length;
 		return {
@@ -76,7 +76,7 @@ const cacheTransactionsData = async (height) => {
 module.exports = {
     getCurrentBlockHeight,
     getBlockInfoBetweenHeight,
-    aggregateResult,
+    getTotalTransferValue,
 	getTxnsAggregate,
 	cacheTransactionsData,
 };
