@@ -18,7 +18,7 @@ const { cacheTransactionsData } = require("../shared/dataService/blocks");
 
 module.exports = [
 	{
-		name: "job.1",
+		name: "cache.average.reward.transfer",
 		description: "Generic job template",
 		schedule: "* * * * *", // Every 1 min
 		controller: () => {
@@ -26,7 +26,7 @@ module.exports = [
 				logger.info(`Job starts`);
 				cacheTransactionsData(10000);
 			} catch (error) {
-				console.log("Job failed", error);
+				logger.warn(`Error occurred while running 'cache.average.reward.transfer' job:\n${err.stack}`);
 			}
 		},
 	},
