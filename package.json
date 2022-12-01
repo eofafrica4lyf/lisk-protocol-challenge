@@ -27,7 +27,8 @@
     "eslint": "eslint .",
     "eslint-fix": "eslint --fix .",
     "clean": "rm -rf ./node_modules",
-    "watch": "supervisor -w . -i ./node_modules app.js"
+    "watch": "supervisor -w . -i ./node_modules app.js",
+    "test": "jest --runInBand --forceExit --coverage"
   },
   "dependencies": {
     "axios": "^1.2.0",
@@ -37,6 +38,7 @@
     "node-cron": "=2.0.3"
   },
   "devDependencies": {
-    "eslint-config-lisk-base": "^2.0.1"
+    "eslint-config-lisk-base": "^2.0.1",
+    "jest": "^29.3.1"
   }
 }
