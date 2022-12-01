@@ -9,7 +9,7 @@ const getCurrentBlockHeight = async () => {
 
 const getBlockInfoBetweenHeight = async (startingHeight, endingHeight) => {
 	let requestArray = [];
-	for (let i = startingHeight; i < endingHeight; i++) {
+	for (let i = startingHeight; i <= endingHeight; i++) {
 		requestArray.push(
 			api.get(`https://mainnet.lisk.com/api/blocks?height=${i}`)
 		);
@@ -27,16 +27,16 @@ const aggregateResult = async (txnsArray) => {
 	return totalTransferValue;
 };
 
-const getTxnsAggregate = async (height) => {
+const getTxnsAggregate = async (height, callUnit = 1000) => {
 	try {
 		let currentHeight = await getCurrentBlockHeight();
 		let fromHeight, toHeight;
 
 		// Batch up requests/promises; the size of each batch is assigned to variable callUnit
 		let requestArray = [];
-		let callUnit = 1000; // found to be consistent/optimal at this value
-		for (let i = 0; i < height / callUnit; i++) {
-			fromHeight = currentHeight - callUnit * (i + 1) + 1;
+		// callUnit was found to be consistent/optimal at the value of 1000
+		for (let i = 0; i < Math.ceil(height / callUnit); i++) {
+			fromHeight = currentHeight - callUnit * (i + 1) + 1;// this doesn't cater for cases where the callUnit is not a divisor of the specified height
 			toHeight = currentHeight - callUnit * i;
 
 			let batch = await getBlockInfoBetweenHeight(fromHeight, toHeight);
