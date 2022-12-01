@@ -58,7 +58,7 @@ const getTxnsAggregate = async (height, callUnit = 1000) => {
 
 		const count = requestArray.length;
 		return {
-			average: Number((totalTransferValue / count).toFixed(2)),
+			average: Number((count > 0 ? totalTransferValue / count : 0).toFixed(2)),
 			total: totalTransferValue,
 			count,
 		};
