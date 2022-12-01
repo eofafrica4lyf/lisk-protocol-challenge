@@ -27,17 +27,18 @@ const getTotalTransferValue = async (txnsArray) => {
 	return totalTransferValue;
 };
 
-const getTxnsAggregate = async (height, callUnit = 1000) => {
+const getTxnsAggregate = async (height, callUnit) => {
 	try {
 		let currentHeight = await getCurrentBlockHeight();
 		let fromHeight, toHeight;
 
 		// Batch up requests/promises; the size of each batch is assigned to variable callUnit
 		let requestArray = [];
+
 		// callUnit was found to be consistent/optimal at the value of 1000
-		for (let i = 0; i < Math.ceil(height / callUnit); i++) {
-			fromHeight = currentHeight - callUnit * (i + 1) + 1;// this doesn't cater for cases where the callUnit is not a divisor of the specified height
-			toHeight = currentHeight - callUnit * i;
+        while (height > 0) {
+            fromHeight = currentHeight - (height > callUnit ? callUnit : height) + 1;
+            toHeight = currentHeight
 
 			let batch = await getBlockInfoBetweenHeight(fromHeight, toHeight);
 
@@ -52,6 +53,9 @@ const getTxnsAggregate = async (height, callUnit = 1000) => {
 					: acc;
 			}, []);
 			requestArray = [...requestArray, ...aggregatedBatch];
+
+            currentHeight -= callUnit;
+            height -= callUnit
 		}
 
 		const totalTransferValue = await getTotalTransferValue(requestArray);
@@ -67,8 +71,9 @@ const getTxnsAggregate = async (height, callUnit = 1000) => {
 	}
 };
 
-const cacheTransactionsData = async (height) => {
-	const data = await getTxnsAggregate(height);
+const cacheTransactionsData = async (height, callUnit) => {
+	const data = await getTxnsAggregate(height, callUnit);
+	console.log("TCL: cacheTransactionsData -> data", data)
 
 	if (data) await setDataInRedis(data);
 	return;
