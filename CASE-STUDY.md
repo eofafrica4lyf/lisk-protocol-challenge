@@ -34,3 +34,7 @@ Off-chaining the data will help us save on-chain data away from the blockchain. 
 A job could be run to records of old blocks which are too far back in time using the heights, if necessary.
 
 Off-chaining however poses a major issue. The data we retrieve is no more immutable, any value in the database can be changed by anyone with enough access, whether legal or not.
+
+## Things to do
+ - Convert to Typescript
+ - Write more robust tests: For some unknown reason, I was not able to stub some functions to write more robust test cases.
