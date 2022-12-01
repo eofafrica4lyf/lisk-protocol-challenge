@@ -1,12 +1,20 @@
 const { api } = require("../helpers/api");
 const { setData: setDataInRedis } = require("../utils/redis");
 
+/**
+ * @desc Get the last block height
+ */
 const getCurrentBlockHeight = async () => {
 	// No try catch block; we assumed that the remote server is 100% reliable
 	const data = await api.get("https://mainnet.lisk.com/api/node/info");
 	return data.data.height;
 };
 
+/**
+ * @desc Get an array of block data between two heights.
+ * @param {*} startingHeight marks the height (inclusive) to which fetching of data starts.
+ * @param {*} endingHeight marks the height (inclusive) to which fetching of block data ends
+ */
 const getBlockInfoBetweenHeight = async (startingHeight, endingHeight) => {
 	let requestArray = [];
 	for (let i = startingHeight; i <= endingHeight; i++) {
@@ -17,6 +25,10 @@ const getBlockInfoBetweenHeight = async (startingHeight, endingHeight) => {
     return await Promise.all(requestArray);
 };
 
+/**
+ * @desc Get a single aggregated value of the total transfer values for all transactions in an array of transactions
+ * @param {*} txnsArray array of transactions
+ */
 const getTotalTransferValue = async (txnsArray) => {
 	const totalTransferValue = txnsArray.reduce((acc, curVal) => {
 		// allow for cases where there is no stated amount, instead there is a votes array of objects
@@ -27,6 +39,11 @@ const getTotalTransferValue = async (txnsArray) => {
 	return totalTransferValue;
 };
 
+/**
+ * @desc Get aggregated data for all transactions in the last "height" blocks.
+ * @param {number} height The number of blocks to process starting from the most recent block
+ * @param {number} batchSize The number of indivdual requests for block data that is batched together at a time.
+ */
 const getTxnsAggregate = async (height, batchSize) => {
 	try {
 		let currentHeight = await getCurrentBlockHeight();
@@ -42,6 +59,7 @@ const getTxnsAggregate = async (height, batchSize) => {
 
 			let batch = await getBlockInfoBetweenHeight(fromHeight, toHeight);
 
+            // flatten array of blocks containing corresponding arrays of transactions into a single array of transactions.
 			const aggregatedBatch = batch.reduce((acc, curVal) => {
 				return curVal.data[0].payload
 					? [
@@ -54,7 +72,9 @@ const getTxnsAggregate = async (height, batchSize) => {
 			}, []);
 			requestArray = [...requestArray, ...aggregatedBatch];
 
+            //update the current height of the blockchain
             currentHeight -= batchSize;
+            // update the number of blocks that remain to be fetched
             height -= batchSize
 		}
 
@@ -71,13 +91,18 @@ const getTxnsAggregate = async (height, batchSize) => {
 	}
 };
 
+/**
+ * @desc Get aggregated transactions data and save in Redis
+ * @param {number} height The number of blocks to process starting from the most recent block
+ * @param {number} batchSize The number of indivdual requests for block data that is batched together at a time.
+ */
 const cacheTransactionsData = async (height, batchSize) => {
 	const data = await getTxnsAggregate(height, batchSize);
-	console.log("TCL: cacheTransactionsData -> data", data)
 
 	if (data) await setDataInRedis(data);
 	return;
 };
+
 module.exports = {
     getCurrentBlockHeight,
     getBlockInfoBetweenHeight,

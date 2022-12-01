@@ -20,8 +20,7 @@ const {
 module.exports = [
 	{
 		name: "average.reward.transfer",
-		description:
-			"Retrieve average reward transfer for transactions belonging to blocks between a certain height",
+		description: "Retrieve average reward transfer for transactions belonging to blocks between a certain height",
 		controller: calculateAverageRewardTransfer,
 	},
 ];

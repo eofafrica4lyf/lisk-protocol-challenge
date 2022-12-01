@@ -24,7 +24,8 @@ module.exports = [
 		controller: () => {
 			try {
 				logger.info(`Job starts`);
-				cacheTransactionsData(10000);
+				// get the last 10000 blocks in batches of 1000 and aggregate their data.
+				cacheTransactionsData(10000, 1000);
 			} catch (error) {
 				logger.warn(`Error occurred while running 'cache.average.reward.transfer' job:\n${err.stack}`);
 			}
